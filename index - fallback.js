@@ -80,11 +80,12 @@
 style.textContent = `
 .stwii--trigger::after {
     opacity: 0 !important;
-    transition: opacity 0.2s ease !important;
+    visibility: hidden !important;
 }
 
 .stwii--trigger:hover::after {
     opacity: 1 !important;
+    visibility: visible !important;
 }
 `;
 document.head.appendChild(style);
