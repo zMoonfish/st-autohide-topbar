@@ -1,3 +1,5 @@
+console.log("auto-hide loaded");
+
 function waitForElements() {
     const TOP_BAR = document.getElementById("top-bar");
     const SETTINGS = document.getElementById("top-settings-holder");
