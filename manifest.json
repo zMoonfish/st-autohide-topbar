@@ -1,6 +1,6 @@
 {
   "display_name": "auto-hide-topbar",
   "author": "zMoonfish",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "js": "index.js"
 }

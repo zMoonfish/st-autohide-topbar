@@ -28,7 +28,7 @@
             top: "0",
             left: "0",
             width: "100%",
-            height: "12px",
+            height: "clamp(16px, 2vh, 32px)", // 👈 bigger + responsive
             zIndex: "999999"
         });
 
@@ -59,7 +59,7 @@
             timeout = setTimeout(() => {
                 visible = false;
                 applyTransform(`translateY(${HIDE_OFFSET}px)`);
-            }, 80);
+            }, 150); // 👈 less twitchy
         }
 
         [TOP_BAR, SETTINGS].forEach(el => {
