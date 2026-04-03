@@ -1,5 +1,6 @@
 {
-  "name": "auto-hide-topbar",
-  "version": "1.0.0",
-  "js": ["index.js"]
+  "display_name": "auto-hide-topbar",
+  "author": "zMoonfish",
+  "version": "1.0.1",
+  "js": "index.js"
 }
