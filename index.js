@@ -1,5 +1,5 @@
 (function () {
-    console.log("[auto-hide] running (dynamic)");
+    console.log("[auto-hide] running (final sane version)");
 
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
@@ -21,18 +21,6 @@
 
         let visible = false;
         let timeout;
-
-        const trigger = document.createElement("div");
-        Object.assign(trigger.style, {
-            position: "fixed",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "clamp(16px, 2vh, 32px)", // 👈 bigger + responsive
-            zIndex: "999999"
-        });
-
-        document.body.appendChild(trigger);
 
         function getBook() {
             return document.querySelector(".stwii--trigger.fa-book-atlas");
@@ -59,7 +47,7 @@
             timeout = setTimeout(() => {
                 visible = false;
                 applyTransform(`translateY(${HIDE_OFFSET}px)`);
-            }, 150); // 👈 less twitchy
+            }, 150);
         }
 
         [TOP_BAR, SETTINGS].forEach(el => {
@@ -67,12 +55,16 @@
             el.style.setProperty("will-change", "transform", "important");
         });
 
-        trigger.addEventListener("pointerenter", show);
-        trigger.addEventListener("pointerleave", hide);
-        TOP_BAR.addEventListener("pointerenter", show);
-        TOP_BAR.addEventListener("pointerleave", hide);
-        SETTINGS.addEventListener("pointerenter", show);
-        SETTINGS.addEventListener("pointerleave", hide);
+        // 👇 hover detection via mouse position (no overlay blocking clicks)
+        document.addEventListener("mousemove", (e) => {
+            const triggerHeight = Math.max(20, window.innerHeight * 0.02);
+
+            if (e.clientY <= triggerHeight) {
+                show();
+            } else {
+                hide();
+            }
+        });
 
         hide();
 
