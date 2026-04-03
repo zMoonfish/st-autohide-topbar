@@ -4,7 +4,6 @@
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
         const SETTINGS = document.getElementById("top-settings-holder");
-        const BOOK = document.querySelector("body > div.stwii--trigger.fa-solid.fa-fw.fa-book-atlas");
 
         if (!TOP_BAR || !SETTINGS) {
             requestAnimationFrame(waitForElements);
@@ -39,11 +38,8 @@
             clearTimeout(timeout);
             if (visible) return;
             visible = true;
-
-            [TOP_BAR, SETTINGS, BOOK].forEach(el => {
-                if (!el) return;
-                el.style.transform = "translateY(0)";
-            });
+            TOP_BAR.style.transform = "translateY(0)";
+            SETTINGS.style.transform = "translateY(0)";
         }
 
         function hide() {
@@ -51,16 +47,12 @@
             timeout = setTimeout(() => {
                 visible = false;
                 const val = `translateY(${HIDE_OFFSET}px)`;
-
-                [TOP_BAR, SETTINGS, BOOK].forEach(el => {
-                    if (!el) return;
-                    el.style.transform = val;
-                });
+                TOP_BAR.style.transform = val;
+                SETTINGS.style.transform = val;
             }, 80);
         }
 
-        [TOP_BAR, SETTINGS, BOOK].forEach(el => {
-            if (!el) return;
+        [TOP_BAR, SETTINGS].forEach(el => {
             el.style.transition = "transform 0.25s ease";
             el.style.willChange = "transform";
         });
