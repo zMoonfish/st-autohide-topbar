@@ -1,5 +1,5 @@
 (function () {
-    console.log("[auto-hide] running (final sane version)");
+    console.log("[auto-hide] smooth version");
 
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
@@ -10,8 +10,6 @@
             return;
         }
 
-        console.log("[auto-hide] elements found");
-
         const height = Math.max(
             TOP_BAR.offsetHeight,
             SETTINGS.offsetHeight
@@ -20,7 +18,7 @@
         const HIDE_OFFSET = -height;
 
         let visible = false;
-        let timeout;
+        let hideTimeout = null;
 
         function getBook() {
             return document.querySelector(".stwii--trigger.fa-book-atlas");
@@ -36,39 +34,45 @@
         }
 
         function show() {
-            clearTimeout(timeout);
             if (visible) return;
             visible = true;
+            clearTimeout(hideTimeout);
             applyTransform("translateY(0)");
         }
 
-        function hide() {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
+        function scheduleHide() {
+            if (!visible) return;
+            if (hideTimeout) return;
+
+            hideTimeout = setTimeout(() => {
                 visible = false;
+                hideTimeout = null;
                 applyTransform(`translateY(${HIDE_OFFSET}px)`);
-            }, 150);
+            }, 120);
         }
 
         [TOP_BAR, SETTINGS].forEach(el => {
-            el.style.setProperty("transition", "transform 0.25s ease", "important");
+            el.style.setProperty("transition", "transform 0.2s ease", "important");
             el.style.setProperty("will-change", "transform", "important");
         });
 
-        // 👇 hover detection via mouse position (no overlay blocking clicks)
+        // 👇 HYSTERESIS ZONES
         document.addEventListener("mousemove", (e) => {
-            const triggerHeight = Math.max(20, window.innerHeight * 0.02);
+            const showZone = Math.max(20, window.innerHeight * 0.02);
+            const hideZone = showZone + 40; // buffer zone
 
-            if (e.clientY <= triggerHeight) {
+            if (e.clientY <= showZone) {
                 show();
-            } else {
-                hide();
+            } else if (e.clientY > hideZone) {
+                scheduleHide();
             }
+            // in-between zone = do nothing (prevents jitter)
         });
 
-        hide();
+        // initial state
+        applyTransform(`translateY(${HIDE_OFFSET}px)`);
 
-        console.log("[auto-hide] initialized");
+        console.log("[auto-hide] initialized (smooth)");
     }
 
     waitForElements();

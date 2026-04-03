@@ -1,5 +1,5 @@
 (function () {
-    console.log("[auto-hide] running (no ST hooks)");
+    console.log("[auto-hide] running (final sane version)");
 
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
@@ -22,47 +22,49 @@
         let visible = false;
         let timeout;
 
-        const trigger = document.createElement("div");
-        Object.assign(trigger.style, {
-            position: "fixed",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "12px",
-            zIndex: "999999"
-        });
+        function getBook() {
+            return document.querySelector(".stwii--trigger.fa-book-atlas");
+        }
 
-        document.body.appendChild(trigger);
+        function applyTransform(val) {
+            const BOOK = getBook();
+
+            [TOP_BAR, SETTINGS, BOOK].forEach(el => {
+                if (!el) return;
+                el.style.setProperty("transform", val, "important");
+            });
+        }
 
         function show() {
             clearTimeout(timeout);
             if (visible) return;
             visible = true;
-            TOP_BAR.style.transform = "translateY(0)";
-            SETTINGS.style.transform = "translateY(0)";
+            applyTransform("translateY(0)");
         }
 
         function hide() {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 visible = false;
-                const val = `translateY(${HIDE_OFFSET}px)`;
-                TOP_BAR.style.transform = val;
-                SETTINGS.style.transform = val;
-            }, 80);
+                applyTransform(`translateY(${HIDE_OFFSET}px)`);
+            }, 150);
         }
 
         [TOP_BAR, SETTINGS].forEach(el => {
-            el.style.transition = "transform 0.25s ease";
-            el.style.willChange = "transform";
+            el.style.setProperty("transition", "transform 0.25s ease", "important");
+            el.style.setProperty("will-change", "transform", "important");
         });
 
-        trigger.addEventListener("pointerenter", show);
-        trigger.addEventListener("pointerleave", hide);
-        TOP_BAR.addEventListener("pointerenter", show);
-        TOP_BAR.addEventListener("pointerleave", hide);
-        SETTINGS.addEventListener("pointerenter", show);
-        SETTINGS.addEventListener("pointerleave", hide);
+        // 👇 hover detection via mouse position (no overlay blocking clicks)
+        document.addEventListener("mousemove", (e) => {
+            const triggerHeight = Math.max(20, window.innerHeight * 0.02);
+
+            if (e.clientY <= triggerHeight) {
+                show();
+            } else {
+                hide();
+            }
+        });
 
         hide();
 
