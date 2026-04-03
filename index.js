@@ -26,9 +26,17 @@
 
         function applyTransform(val) {
             const BOOK = getBook();
-
+        
             [TOP_BAR, SETTINGS, BOOK].forEach(el => {
                 if (!el) return;
+        
+                // 👇 ensure transition exists
+                if (!el.dataset.autohideStyled) {
+                    el.style.setProperty("transition", "transform 0.2s ease", "important");
+                    el.style.setProperty("will-change", "transform", "important");
+                    el.dataset.autohideStyled = "true";
+                }
+        
                 el.style.setProperty("transform", val, "important");
             });
         }
