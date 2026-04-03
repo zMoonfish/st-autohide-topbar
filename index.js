@@ -1,10 +1,9 @@
 (function () {
-    console.log("[auto-hide] running (no ST hooks)");
+    console.log("[auto-hide] running (dynamic)");
 
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
         const SETTINGS = document.getElementById("top-settings-holder");
-        const BOOK = document.querySelector("body > div.stwii--trigger.fa-solid.fa-fw.fa-book-atlas");
 
         if (!TOP_BAR || !SETTINGS) {
             requestAnimationFrame(waitForElements);
@@ -35,34 +34,37 @@
 
         document.body.appendChild(trigger);
 
+        function getBook() {
+            return document.querySelector(".stwii--trigger.fa-book-atlas");
+        }
+
+        function applyTransform(val) {
+            const BOOK = getBook();
+
+            [TOP_BAR, SETTINGS, BOOK].forEach(el => {
+                if (!el) return;
+                el.style.setProperty("transform", val, "important");
+            });
+        }
+
         function show() {
             clearTimeout(timeout);
             if (visible) return;
             visible = true;
-
-            [TOP_BAR, SETTINGS, BOOK].forEach(el => {
-                if (!el) return;
-                el.style.transform = "translateY(0)";
-            });
+            applyTransform("translateY(0)");
         }
 
         function hide() {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 visible = false;
-                const val = `translateY(${HIDE_OFFSET}px)`;
-
-                [TOP_BAR, SETTINGS, BOOK].forEach(el => {
-                    if (!el) return;
-                    el.style.transform = val;
-                });
+                applyTransform(`translateY(${HIDE_OFFSET}px)`);
             }, 80);
         }
 
-        [TOP_BAR, SETTINGS, BOOK].forEach(el => {
-            if (!el) return;
-            el.style.transition = "transform 0.25s ease";
-            el.style.willChange = "transform";
+        [TOP_BAR, SETTINGS].forEach(el => {
+            el.style.setProperty("transition", "transform 0.25s ease", "important");
+            el.style.setProperty("will-change", "transform", "important");
         });
 
         trigger.addEventListener("pointerenter", show);
