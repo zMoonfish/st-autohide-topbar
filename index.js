@@ -5,6 +5,21 @@
         const TOP_BAR = document.getElementById("top-bar");
         const SETTINGS = document.getElementById("top-settings-holder");
 
+        const style = document.createElement("style");
+        style.textContent = `
+        .stwii--trigger.fa-book-atlas {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        
+        .stwii--trigger.fa-book-atlas:hover {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        `;
+        document.head.appendChild(style);
+
         if (!TOP_BAR || !SETTINGS) {
             requestAnimationFrame(waitForElements);
             return;
