@@ -78,14 +78,14 @@
         // 👇 ONLY NEW PART: bottom dot fade fix
         const style = document.createElement("style");
 style.textContent = `
+/* kill the badge (dot) */
 .stwii--trigger::after {
-    opacity: 0 !important;
-    visibility: hidden !important;
+    display: none !important;
 }
 
+/* optional: bring it back on hover */
 .stwii--trigger:hover::after {
-    opacity: 1 !important;
-    visibility: visible !important;
+    display: block !important;
 }
 `;
 document.head.appendChild(style);
