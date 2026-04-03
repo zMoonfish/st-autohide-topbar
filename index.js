@@ -1,5 +1,5 @@
 (function () {
-    console.log("[auto-hide] final + book wrapper");
+    console.log("[auto-hide] stable + simple book fix");
 
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
@@ -16,17 +16,6 @@
 
         function getBook() {
             return document.querySelector(".stwii--trigger.fa-book-atlas");
-        }
-
-        function wrapBook() {
-            const book = getBook();
-            if (!book || book.parentElement.classList.contains("autohide-book-wrapper")) return;
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "autohide-book-wrapper";
-
-            book.parentNode.insertBefore(wrapper, book);
-            wrapper.appendChild(book);
         }
 
         function applyTransform(y) {
@@ -76,33 +65,28 @@
             }, 120);
         }
 
-        // inject styles once
+        // 👇 SIMPLE BOOK FIX (no wrapping, no DOM surgery)
         const style = document.createElement("style");
         style.textContent = `
-        .autohide-book-wrapper {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            width: 60px;
-            height: 60px;
-            z-index: 9999;
-        }
-
         .stwii--trigger.fa-book-atlas {
-            opacity: 0;
+            opacity: 0.2;
             transition: opacity 0.2s ease;
         }
 
-        .autohide-book-wrapper:hover .stwii--trigger.fa-book-atlas {
+        .stwii--trigger.fa-book-atlas:hover {
             opacity: 1;
+        }
+
+        /* slightly bigger hover zone */
+        .stwii--trigger.fa-book-atlas::before {
+            content: "";
+            position: absolute;
+            inset: -15px;
         }
         `;
         document.head.appendChild(style);
 
-        // keep trying to wrap (in case it's injected later)
-        setInterval(wrapBook, 1000);
-
-        // stabilize layout
+        // stabilize layout (safe)
         [TOP_BAR, SETTINGS].forEach(el => {
             el.style.setProperty("position", "relative", "important");
             el.style.setProperty("z-index", "1000", "important");
@@ -120,7 +104,6 @@
             }
         });
 
-        // resize / fullscreen fix
         window.addEventListener("resize", () => {
             setTimeout(recalc, 50);
         });
