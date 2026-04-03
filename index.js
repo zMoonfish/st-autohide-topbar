@@ -1,5 +1,5 @@
 (function () {
-    console.log("[auto-hide] smooth version");
+    console.log("[auto-hide] final stable version");
 
     function waitForElements() {
         const TOP_BAR = document.getElementById("top-bar");
@@ -10,13 +10,7 @@
             return;
         }
 
-        const height = Math.max(
-            TOP_BAR.offsetHeight,
-            SETTINGS.offsetHeight
-        );
-
-        const HIDE_OFFSET = -height;
-
+        let HIDE_OFFSET = 0;
         let visible = false;
         let hideTimeout = null;
 
@@ -24,28 +18,40 @@
             return document.querySelector(".stwii--trigger.fa-book-atlas");
         }
 
-        function applyTransform(val) {
+        function applyTransform(y) {
             const BOOK = getBook();
-        
+
             [TOP_BAR, SETTINGS, BOOK].forEach(el => {
                 if (!el) return;
-        
-                // 👇 ensure transition exists
+
                 if (!el.dataset.autohideStyled) {
                     el.style.setProperty("transition", "transform 0.2s ease", "important");
                     el.style.setProperty("will-change", "transform", "important");
                     el.dataset.autohideStyled = "true";
                 }
-        
-                el.style.setProperty("transform", val, "important");
+
+                el.style.setProperty("transform", `translate3d(0, ${y}px, 0)`, "important");
             });
+        }
+
+        function recalc() {
+            const height = Math.max(
+                TOP_BAR.offsetHeight,
+                SETTINGS.offsetHeight
+            );
+
+            HIDE_OFFSET = -height;
+
+            if (!visible) {
+                applyTransform(HIDE_OFFSET);
+            }
         }
 
         function show() {
             if (visible) return;
             visible = true;
             clearTimeout(hideTimeout);
-            applyTransform("translateY(0)");
+            applyTransform(0);
         }
 
         function scheduleHide() {
@@ -55,32 +61,38 @@
             hideTimeout = setTimeout(() => {
                 visible = false;
                 hideTimeout = null;
-                applyTransform(`translateY(${HIDE_OFFSET}px)`);
+                applyTransform(HIDE_OFFSET);
             }, 120);
         }
 
+        // stabilize layout behavior
         [TOP_BAR, SETTINGS].forEach(el => {
-            el.style.setProperty("transition", "transform 0.2s ease", "important");
-            el.style.setProperty("will-change", "transform", "important");
+            el.style.setProperty("position", "relative", "important");
+            el.style.setProperty("z-index", "1000", "important");
+            el.style.setProperty("contain", "layout style", "important");
         });
 
-        // 👇 HYSTERESIS ZONES
+        // smart hover detection
         document.addEventListener("mousemove", (e) => {
             const showZone = Math.max(20, window.innerHeight * 0.02);
-            const hideZone = showZone + 40; // buffer zone
+            const hideZone = showZone + 40;
 
             if (e.clientY <= showZone) {
                 show();
             } else if (e.clientY > hideZone) {
                 scheduleHide();
             }
-            // in-between zone = do nothing (prevents jitter)
         });
 
-        // initial state
-        applyTransform(`translateY(${HIDE_OFFSET}px)`);
+        // 🔧 FIX: handle fullscreen / resize properly
+        window.addEventListener("resize", () => {
+            setTimeout(recalc, 50);
+        });
 
-        console.log("[auto-hide] initialized (smooth)");
+        // initial setup
+        recalc();
+
+        console.log("[auto-hide] initialized (fully stable)");
     }
 
     waitForElements();
