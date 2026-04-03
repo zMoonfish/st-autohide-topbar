@@ -77,18 +77,17 @@
 
         // 👇 ONLY NEW PART: bottom dot fade fix
         const style = document.createElement("style");
-style.textContent = `
-/* kill the badge (dot) */
-.stwii--trigger::after {
-    display: none !important;
-}
+        style.textContent = `
+        .stwii--trigger > *:last-child {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
 
-/* optional: bring it back on hover */
-.stwii--trigger:hover::after {
-    display: block !important;
-}
-`;
-document.head.appendChild(style);
+        .stwii--trigger:hover > *:last-child {
+            opacity: 1;
+        }
+        `;
+        document.head.appendChild(style);
 
         // initial state
         applyTransform(`translateY(${HIDE_OFFSET}px)`);
