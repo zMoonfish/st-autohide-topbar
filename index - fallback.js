@@ -77,25 +77,21 @@
 
         // 👇 ONLY NEW PART: bottom dot fade fix
         const style = document.createElement("style");
-style.textContent = `
-/* target small bottom circle-like element */
-.stwii--trigger div {
-    transition: opacity 0.2s ease;
-}
-
-/* hide only small elements near bottom */
-.stwii--trigger div[style*="bottom"],
-.stwii--trigger div[class*="bottom"] {
-    opacity: 0;
-}
-
-/* show on hover */
-.stwii--trigger:hover div[style*="bottom"],
-.stwii--trigger:hover div[class*="bottom"] {
-    opacity: 1;
-}
-`;
-document.head.appendChild(style);
+        style.textContent = `
+        /* target pseudo-element (the dot) */
+        .stwii--trigger::after,
+        .stwii--trigger::before {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        /* show on hover */
+        .stwii--trigger:hover::after,
+        .stwii--trigger:hover::before {
+            opacity: 1;
+        }
+        `;
+        document.head.appendChild(style);
 
         // initial state
         applyTransform(`translateY(${HIDE_OFFSET}px)`);
