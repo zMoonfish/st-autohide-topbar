@@ -1,54 +1,70 @@
-id="st-autohide-topbar"
 (function () {
-    function init() {
-        const bar = document.querySelector('#top-bar');
-        const settings = document.querySelector('#top-settings-holder');
+    const TOP_BAR = document.getElementById("top-bar");
+    const SETTINGS = document.getElementById("top-settings-holder");
 
-        if (!bar || !settings) {
-            setTimeout(init, 500);
-            return;
-        }
+    if (!TOP_BAR || !SETTINGS) return;
 
-        // create trigger zone
-        const trigger = document.createElement('div');
-        trigger.style.position = 'fixed';
-        trigger.style.top = '0';
-        trigger.style.left = '0';
-        trigger.style.width = '100%';
-        trigger.style.height = '12px';
-        trigger.style.zIndex = '10001';
-        document.body.appendChild(trigger);
+    const HIDE_OFFSET = -60; // adjust if your bar height differs
+    const TRIGGER_HEIGHT = 12;
 
-        // base styles
-        [bar, settings].forEach(el => {
-            el.style.position = 'fixed';
-            el.style.top = '0';
-            el.style.left = '0';
-            el.style.width = '100%';
-            el.style.transform = 'translateY(-100%)';
-            el.style.transition = 'transform 0.2s ease';
-            el.style.zIndex = '9999';
+    let visible = false;
+    let hideTimeout = null;
+
+    // Create invisible trigger zone
+    const trigger = document.createElement("div");
+    trigger.style.position = "fixed";
+    trigger.style.top = "0";
+    trigger.style.left = "0";
+    trigger.style.width = "100%";
+    trigger.style.height = TRIGGER_HEIGHT + "px";
+    trigger.style.zIndex = "9999";
+    trigger.style.pointerEvents = "auto";
+    trigger.style.background = "transparent";
+
+    document.body.appendChild(trigger);
+
+    function applyStyles() {
+        [TOP_BAR, SETTINGS].forEach(el => {
+            el.style.transition = "transform 0.25s ease";
+            el.style.willChange = "transform";
         });
-
-        settings.style.zIndex = '10000';
-
-        function show() {
-            bar.style.transform = 'translateY(0)';
-            settings.style.transform = 'translateY(0)';
-        }
-
-        function hide() {
-            bar.style.transform = 'translateY(-100%)';
-            settings.style.transform = 'translateY(-100%)';
-        }
-
-        trigger.addEventListener('mouseenter', show);
-        bar.addEventListener('mouseenter', show);
-        settings.addEventListener('mouseenter', show);
-
-        bar.addEventListener('mouseleave', hide);
-        settings.addEventListener('mouseleave', hide);
     }
 
-    init();
+    function show() {
+        clearTimeout(hideTimeout);
+        if (visible) return;
+        visible = true;
+        TOP_BAR.style.transform = "translateY(0)";
+        SETTINGS.style.transform = "translateY(0)";
+    }
+
+    function hide() {
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(() => {
+            visible = false;
+            TOP_BAR.style.transform = `translateY(${HIDE_OFFSET}px)`;
+            SETTINGS.style.transform = `translateY(${HIDE_OFFSET}px)`;
+        }, 80);
+    }
+
+    function init() {
+        applyStyles();
+        hide();
+
+        trigger.addEventListener("pointerenter", show);
+        trigger.addEventListener("pointerleave", hide);
+
+        TOP_BAR.addEventListener("pointerenter", show);
+        TOP_BAR.addEventListener("pointerleave", hide);
+
+        SETTINGS.addEventListener("pointerenter", show);
+        SETTINGS.addEventListener("pointerleave", hide);
+    }
+
+    // Wait for DOM just in case
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
 })();
