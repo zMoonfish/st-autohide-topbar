@@ -78,15 +78,13 @@
         // 👇 ONLY NEW PART: bottom dot fade fix
         const style = document.createElement("style");
 style.textContent = `
-/* hide ONLY the dot */
 .stwii--trigger::after {
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    opacity: 0 !important;
+    transition: opacity 0.2s ease !important;
 }
 
-/* show dot on hover */
 .stwii--trigger:hover::after {
-    opacity: 1;
+    opacity: 1 !important;
 }
 `;
 document.head.appendChild(style);
