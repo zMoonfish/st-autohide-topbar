@@ -1,0 +1,7 @@
+{
+    "name": "Auto Hide Top Bar",
+    "description": "Hides the top bar and shows it on hover",
+    "version": "1.0.0",
+    "author": "zMoonfish",
+    "entry": "index.js"
+  }
