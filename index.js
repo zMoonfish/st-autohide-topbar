@@ -89,6 +89,16 @@
             .stwii--trigger[data-autohide-hidebadge="true"]:hover::after {
                 display: block !important;
             }
+
+            /* STMemoryBooks "jump to unprocessed message" button(s) */
+            .stmb_memory_boundary_button {
+                opacity: 0 !important;
+                transition: opacity 0.2s ease !important;
+            }
+
+            .stmb_memory_boundary_button:hover {
+                opacity: 1 !important;
+            }
             `;
             document.head.appendChild(style);
 
