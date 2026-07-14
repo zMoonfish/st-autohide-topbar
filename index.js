@@ -90,15 +90,6 @@
                 display: block !important;
             }
 
-            /* STMemoryBooks "jump to unprocessed message" button(s) */
-            .stmb_memory_boundary_button {
-                opacity: 0 !important;
-                transition: opacity 0.2s ease !important;
-            }
-
-            .stmb_memory_boundary_button:hover {
-                opacity: 1 !important;
-            }
             `;
             document.head.appendChild(style);
 
@@ -116,5 +107,66 @@
         console.log("[auto-hide] initialized (with toggle)");
     }
 
+    // 👇 STMemoryBooks "jump to unprocessed message" button — hover-hotzone reveal
+    // (this button has no always-visible parent to hover, unlike the badge dot,
+    // so we build an invisible box that tracks its real position and reveals it)
+    function initMemoryBoundaryHotzone() {
+        const SELECTOR = ".stmb_memory_boundary_button";
+        const PAD = 10; // extra margin around the button, easier to find with the mouse
+
+        let hotzone = null;
+        let currentBtn = null;
+        let hideTimer = null;
+
+        function ensureHotzone() {
+            if (hotzone) return hotzone;
+            hotzone = document.createElement("div");
+            hotzone.style.position = "fixed";
+            hotzone.style.zIndex = "99999";
+            hotzone.style.background = "transparent";
+            hotzone.style.pointerEvents = "auto";
+            document.body.appendChild(hotzone);
+
+            hotzone.addEventListener("mouseenter", () => {
+                clearTimeout(hideTimer);
+                if (currentBtn) currentBtn.style.setProperty("opacity", "1", "important");
+            });
+            hotzone.addEventListener("mouseleave", () => {
+                hideTimer = setTimeout(() => {
+                    if (currentBtn) currentBtn.style.setProperty("opacity", "0", "important");
+                }, 150);
+            });
+
+            return hotzone;
+        }
+
+        function sync() {
+            const btn = document.querySelector(SELECTOR);
+            if (!btn) {
+                requestAnimationFrame(sync);
+                return;
+            }
+            currentBtn = btn;
+
+            if (!btn.dataset.autohideHotzoneStyled) {
+                btn.style.setProperty("opacity", "0", "important");
+                btn.style.setProperty("transition", "opacity 0.2s ease", "important");
+                btn.dataset.autohideHotzoneStyled = "true";
+            }
+
+            const hz = ensureHotzone();
+            const rect = btn.getBoundingClientRect();
+            hz.style.left = (rect.left - PAD) + "px";
+            hz.style.top = (rect.top - PAD) + "px";
+            hz.style.width = (rect.width + PAD * 2) + "px";
+            hz.style.height = (rect.height + PAD * 2) + "px";
+
+            requestAnimationFrame(sync);
+        }
+
+        sync();
+    }
+
     waitForElements();
+    initMemoryBoundaryHotzone();
 })();
